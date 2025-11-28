@@ -2,12 +2,32 @@ import json
 import os
 
 def limpiar_consola():
+    '''
+    Limpia la consola según el sistema operativo.
+
+    Esta función detecta el sistema operativo actual y ejecuta el comando
+    correspondiente para limpiar la pantalla de la terminal.
+    '''
     if os.name == "nt":
         os.system("cls")
     else:
         os.system("clear")
         
-def inicializar_datos():
+def inicializar_datos()-> dict | None:
+    '''
+    Inicializa el archivo de trabajo 'datos_usuarios.json' a partir del origen.
+
+    Lee el contenido de ``datos_usuarios_orig.json`` y, si es válido y contiene
+    usuarios, lo copia a ``datos_usuarios.json`` sobrescribiendo su contenido.
+
+    Returns
+    -------
+    dict or None
+        Diccionario con los datos cargados si la operación se realiza con éxito.
+        Devuelve ``None`` si ocurre algún error o si el JSON de origen no
+        contiene usuarios.
+
+    '''
     try:
         with open('./datos_usuarios_orig.json','r') as archivo_original:
             datos = json.load(archivo_original)
@@ -33,9 +53,34 @@ def inicializar_datos():
     return datos
 
 def modificar_datos(datos:dict):
+    '''
+    Permite modificar la lista de usuarios interactuando por consola.
+
+    Muestra un menú con distintas operaciones sobre los usuarios y va
+    solicitando datos al usuario hasta que se elija la opción ``terminar``.
+
+    Parámetros
+    ----------
+    datos : dict
+        Diccionario que contiene, al menos, la clave ``"usuarios"`` con una
+        lista de diccionarios de usuario. Cada usuario debe tener las claves
+        ``"id"``, ``"nombre"`` y ``"edad"``.
+
+    Operaciones
+    -----------
+    - ``actualizar``: Actualiza la edad de un usuario existente.
+    - ``insertar``: Inserta un nuevo usuario con ID único, nombre y edad válidos.
+    - ``eliminar``: Elimina un usuario existente por su ID.
+    - ``terminar``: Muestra los datos y guarda el JSON en disco.
+    '''
     terminado = False
     while not terminado:
-        eleccion = input("Introduzca 'actualizar' si desea actualizar la edad de un usuario, 'insertar' si desea añadir un nuevo usuario,'eliminar' si desea borrar un usuario o 'terminar' para finalizar el programa.\n")
+        eleccion = input(
+            "Introduzca 'actualizar' para actualizar la edad de un usuario, "
+            "'insertar' para añadir un nuevo usuario, "
+            "'eliminar' para borrar un usuario o "
+            "'terminar' para finalizar el programa.\n"
+        ).lower()
         while eleccion.lower() != 'actualizar' and eleccion.lower() != 'insertar' and eleccion.lower() != 'eliminar' and eleccion.lower() != 'terminar':
             print("ERROR. Introduzca un valor válido ('actualizar','insertar','eliminar' o 'terminar'.)\n")
             eleccion = input("Introduzca 'actualizar si desea actualizar la edad de un usuario, 'insertar si desea añadir un nuevo usuario,'eliminar' si desea borrar un usuario o 'terminar' para finalizar el programa.\n")
@@ -118,6 +163,13 @@ def modificar_datos(datos:dict):
                 return None
 
 def pausar():
+    '''
+    Realiza una pausa en la ejecución hasta que el usuario pulse Enter.
+
+    La función muestra un mensaje en consola y espera a que el usuario
+    presione la tecla Enter antes de continuar con la ejecución del programa.
+
+    '''
     input("Presione Enter para continuar...")
     
 def mostrar_datos(datos:dict):
@@ -136,6 +188,7 @@ def main():
     if datos is not None:
         mostrar_datos(datos)
     else:
+        print("El archivo JSON no existe o es inválido.")
         exit()
     pausar()
     modificar_datos(datos)
